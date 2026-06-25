@@ -115,44 +115,98 @@ The Python backend runs as a long-running sidecar process that communicates with
 | [UV](https://docs.astral.sh/uv/) | 0.4+ |
 | Python | 3.12+ (managed by UV) |
 
-## Installation and Development Setup
+## Quick Start — One-Liner Build
+
+The setup script automatically installs all missing dependencies (Node.js, Rust, UV), builds the Python sidecar, and compiles the application.
+
+### macOS / Linux
 
 ```bash
-# Clone the repository
+git clone https://github.com/JhojanAlexanderCalambasRamirez/MdConverter.git && cd MdConverter && ./scripts/setup.sh
+```
+
+Or remotely (no need to clone first):
+
+```bash
+curl -sSL https://raw.githubusercontent.com/JhojanAlexanderCalambasRamirez/MdConverter/main/scripts/setup.sh | bash
+```
+
+After the build completes:
+1. Open the generated `.dmg` file from `src-tauri/target/release/bundle/dmg/`
+2. Drag **MdConverter** to **Applications**
+3. Run `xattr -cr /Applications/MdConverter.app` (required for unsigned apps)
+4. Open MdConverter from Applications
+
+### Windows (PowerShell as Administrator)
+
+```powershell
+git clone https://github.com/JhojanAlexanderCalambasRamirez/MdConverter.git; cd MdConverter; .\scripts\setup.ps1
+```
+
+Or remotely (no need to clone first):
+
+```powershell
+irm https://raw.githubusercontent.com/JhojanAlexanderCalambasRamirez/MdConverter/main/scripts/setup.ps1 | iex
+```
+
+After the build completes:
+1. Run the `.exe` installer from `src-tauri\target\release\bundle\nsis\`
+2. Follow the installation wizard
+3. Open MdConverter from the Start Menu
+
+## Manual Installation and Development Setup
+
+If you prefer to set up the project manually step by step:
+
+### Prerequisites
+
+| Tool | Version | Install |
+|------|---------|---------|
+| [Node.js](https://nodejs.org/) | v20+ | `brew install node` (macOS) / `winget install OpenJS.NodeJS.LTS` (Windows) |
+| [Rust](https://www.rust-lang.org/tools/install) | 1.77+ | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh` |
+| [UV](https://docs.astral.sh/uv/) | 0.4+ | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| [Tauri CLI](https://v2.tauri.app/) | 2.x | `cargo install tauri-cli --version "^2"` |
+
+### Step-by-step setup
+
+```bash
+# 1. Clone the repository
 git clone https://github.com/JhojanAlexanderCalambasRamirez/MdConverter.git
 cd MdConverter
 
-# Install frontend dependencies
+# 2. Install frontend dependencies
 cd frontend && npm install && cd ..
 
-# Install Python dependencies
+# 3. Install Python backend dependencies
 cd backend && uv sync && cd ..
 
-# Run in development mode
+# 4. Run in development mode (hot-reload enabled)
 cargo tauri dev
 ```
 
-## Building for Distribution
+### Building for distribution
 
-### macOS (.dmg)
+#### macOS (.dmg)
 
 ```bash
-# Build the Python sidecar
+# Build the Python sidecar binary
 ./scripts/build-sidecar.sh
 
-# Build the application
+# Build the Tauri application
 cargo tauri build
+
 # Output: src-tauri/target/release/bundle/dmg/MdConverter_1.0.0_aarch64.dmg
 ```
 
-### Windows (.exe)
+#### Windows (.exe)
 
 ```powershell
-# Build the Python sidecar
+# Build the Python sidecar binary
 .\scripts\build-sidecar.ps1
 
-# Build the application
+# Build the Tauri application
 cargo tauri build
+
 # Output: src-tauri\target\release\bundle\nsis\MdConverter_1.0.0_x64-setup.exe
 ```
 
@@ -304,26 +358,80 @@ El backend Python se ejecuta como un proceso sidecar persistente que se comunica
 | [UV](https://docs.astral.sh/uv/) | 0.4+ |
 | Python | 3.12+ (gestionado por UV) |
 
-## Instalacion y Configuracion de Desarrollo
+## Inicio Rapido — Compilacion en Una Linea
+
+El script de configuracion instala automaticamente todas las dependencias faltantes (Node.js, Rust, UV), compila el sidecar Python y construye la aplicacion.
+
+### macOS / Linux
 
 ```bash
-# Clonar el repositorio
+git clone https://github.com/JhojanAlexanderCalambasRamirez/MdConverter.git && cd MdConverter && ./scripts/setup.sh
+```
+
+O de forma remota (sin necesidad de clonar primero):
+
+```bash
+curl -sSL https://raw.githubusercontent.com/JhojanAlexanderCalambasRamirez/MdConverter/main/scripts/setup.sh | bash
+```
+
+Despues de que la compilacion termine:
+
+1. Abre el archivo `.dmg` generado en `src-tauri/target/release/bundle/dmg/`
+2. Arrastra **MdConverter** a **Aplicaciones**
+3. Ejecuta `xattr -cr /Applications/MdConverter.app` (necesario para apps sin firma)
+4. Abre MdConverter desde Aplicaciones
+
+### Windows (PowerShell como Administrador)
+
+```powershell
+git clone https://github.com/JhojanAlexanderCalambasRamirez/MdConverter.git; cd MdConverter; .\scripts\setup.ps1
+```
+
+O de forma remota (sin necesidad de clonar primero):
+
+```powershell
+irm https://raw.githubusercontent.com/JhojanAlexanderCalambasRamirez/MdConverter/main/scripts/setup.ps1 | iex
+```
+
+Despues de que la compilacion termine:
+
+1. Ejecuta el instalador `.exe` desde `src-tauri\target\release\bundle\nsis\`
+2. Sigue el asistente de instalacion
+3. Abre MdConverter desde el Menu Inicio
+
+## Instalacion Manual y Configuracion de Desarrollo
+
+Si prefieres configurar el proyecto manualmente paso a paso:
+
+### Requisitos previos
+
+| Herramienta | Version | Instalar |
+|-------------|---------|----------|
+| [Node.js](https://nodejs.org/) | v20+ | `brew install node` (macOS) / `winget install OpenJS.NodeJS.LTS` (Windows) |
+| [Rust](https://www.rust-lang.org/tools/install) | 1.77+ | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh` |
+| [UV](https://docs.astral.sh/uv/) | 0.4+ | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| [Tauri CLI](https://v2.tauri.app/) | 2.x | `cargo install tauri-cli --version "^2"` |
+
+### Configuracion paso a paso
+
+```bash
+# 1. Clonar el repositorio
 git clone https://github.com/JhojanAlexanderCalambasRamirez/MdConverter.git
 cd MdConverter
 
-# Instalar dependencias del frontend
+# 2. Instalar dependencias del frontend
 cd frontend && npm install && cd ..
 
-# Instalar dependencias de Python
+# 3. Instalar dependencias del backend Python
 cd backend && uv sync && cd ..
 
-# Ejecutar en modo desarrollo
+# 4. Ejecutar en modo desarrollo (hot-reload habilitado)
 cargo tauri dev
 ```
 
-## Compilacion para Distribucion
+### Compilacion para distribucion
 
-### macOS (.dmg)
+#### macOS (.dmg)
 
 ```bash
 # Compilar el sidecar Python
@@ -331,10 +439,11 @@ cargo tauri dev
 
 # Compilar la aplicacion
 cargo tauri build
+
 # Salida: src-tauri/target/release/bundle/dmg/MdConverter_1.0.0_aarch64.dmg
 ```
 
-### Windows (.exe)
+#### Windows (.exe)
 
 ```powershell
 # Compilar el sidecar Python
@@ -342,6 +451,7 @@ cargo tauri build
 
 # Compilar la aplicacion
 cargo tauri build
+
 # Salida: src-tauri\target\release\bundle\nsis\MdConverter_1.0.0_x64-setup.exe
 ```
 

@@ -16,8 +16,10 @@ pub fn run() {
             let handle = app.handle().clone();
             let state = app.state::<Mutex<SidecarState>>();
             let mut s = tauri::async_runtime::block_on(state.lock());
-            sidecar::spawn_sidecar(&handle, &mut s)
-                .expect("Failed to spawn Python sidecar");
+            match sidecar::spawn_sidecar(&handle, &mut s) {
+                Ok(()) => eprintln!("[sidecar] started successfully"),
+                Err(e) => eprintln!("[sidecar] failed to start: {e}. Conversion will not work until restart."),
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

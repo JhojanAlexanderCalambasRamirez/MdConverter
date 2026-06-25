@@ -10,7 +10,12 @@ uv run pyinstaller \
   --onefile \
   --name mdconverter-sidecar \
   --console \
+  --collect-data magika \
+  --collect-data markitdown \
+  --hidden-import converter.engine \
+  --hidden-import converter.file_utils \
   --distpath "$PROJECT_ROOT/src-tauri/binaries/" \
+  --clean \
   converter/main.py
 
 mv "$PROJECT_ROOT/src-tauri/binaries/mdconverter-sidecar" \
