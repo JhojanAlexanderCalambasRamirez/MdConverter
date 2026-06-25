@@ -1,0 +1,73 @@
+.dropZone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-drop-zone);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-height: 200px;
+}
+
+.dropZone:hover {
+  border-color: var(--color-border-drop);
+  background: var(--color-bg-drop-zone-hover);
+}
+
+.dragging {
+  border-color: var(--color-border-drop);
+  background: var(--color-bg-drop-zone-hover);
+  border-style: solid;
+}
+
+.compact {
+  min-height: 80px;
+  flex: none;
+}
+
+.compact .content {
+  flex-direction: row;
+  gap: 12px;
+}
+
+.compact .icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.compact .text {
+  font-size: 14px;
+}
+
+.compact .subtext {
+  display: none;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  color: var(--color-text-muted);
+}
+
+.text {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.subtext {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
