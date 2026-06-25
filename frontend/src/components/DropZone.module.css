@@ -71,3 +71,34 @@
   font-size: 13px;
   color: var(--color-text-muted);
 }
+
+.folderBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.folderBtn:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+.folderBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.compact .folderBtn {
+  display: none;
+}

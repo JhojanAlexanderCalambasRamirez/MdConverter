@@ -25,6 +25,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::convert_file,
             commands::reveal_in_folder,
+            commands::list_folder_files,
+            commands::create_zip,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::Destroyed = event {

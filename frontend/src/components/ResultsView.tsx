@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import type { FileItem } from '../types';
 import type { Translations } from '../i18n/translations';
 import { CheckCircleIcon, XCircleIcon, FolderOpenIcon } from './Icons';
+import { createZip, revealInFolder } from '../services/tauriCommands';
 import styles from './ResultsView.module.css';
 
 interface ResultsViewProps {
@@ -19,6 +21,27 @@ function getDirectory(path: string): string {
 export function ResultsView({ files, onRevealInFolder, onReset, t }: ResultsViewProps) {
   const successFiles = files.filter((f) => f.status === 'success');
   const errorFiles = files.filter((f) => f.status === 'error');
+  const [zipPath, setZipPath] = useState<string | null>(null);
+  const [zipping, setZipping] = useState(false);
+
+  const handleDownloadZip = async () => {
+    const outputPaths = successFiles
+      .map((f) => f.outputPath)
+      .filter((p): p is string => !!p);
+    if (outputPaths.length === 0) return;
+
+    const firstDir = getDirectory(outputPaths[0]);
+    const zipOutput = `${firstDir}/MdConverter_output.zip`;
+
+    setZipping(true);
+    try {
+      const result = await createZip(outputPaths, zipOutput);
+      setZipPath(result);
+    } catch (e) {
+      console.error('Failed to create zip:', e);
+    }
+    setZipping(false);
+  };
 
   return (
     <div className={styles.container}>
@@ -88,9 +111,24 @@ export function ResultsView({ files, onRevealInFolder, onReset, t }: ResultsView
         ))}
       </div>
 
-      <button className={styles.resetBtn} onClick={onReset}>
-        {t.convertMoreFiles}
-      </button>
+      <div className={styles.bottomActions}>
+        {successFiles.length > 1 && (
+          <button
+            className={styles.zipBtn}
+            onClick={zipPath ? () => revealInFolder(zipPath) : handleDownloadZip}
+            disabled={zipping}
+          >
+            {zipping
+              ? '...'
+              : zipPath
+                ? t.zipCreated
+                : t.downloadZip}
+          </button>
+        )}
+        <button className={styles.resetBtn} onClick={onReset}>
+          {t.convertMoreFiles}
+        </button>
+      </div>
     </div>
   );
 }

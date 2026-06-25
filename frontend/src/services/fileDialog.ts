@@ -26,3 +26,13 @@ export async function selectFiles(): Promise<string[] | null> {
   if (result === null) return null;
   return Array.isArray(result) ? result : [result];
 }
+
+export async function selectFolder(): Promise<string | null> {
+  const result = await open({
+    multiple: false,
+    directory: true,
+  });
+
+  if (result === null) return null;
+  return Array.isArray(result) ? result[0] : result;
+}

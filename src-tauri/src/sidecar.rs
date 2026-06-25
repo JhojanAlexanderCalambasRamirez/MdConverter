@@ -29,7 +29,6 @@ impl SidecarState {
 }
 
 fn find_uv() -> Option<String> {
-    // macOS / Linux paths
     #[cfg(not(target_os = "windows"))]
     let candidates: &[&str] = &[
         "/opt/homebrew/bin/uv",
@@ -37,7 +36,6 @@ fn find_uv() -> Option<String> {
         "/usr/bin/uv",
     ];
 
-    // Windows paths
     #[cfg(target_os = "windows")]
     let candidates: &[&str] = &[];
 
@@ -47,29 +45,24 @@ fn find_uv() -> Option<String> {
         }
     }
 
-    // Windows: check USERPROFILE\.local\bin\uv.exe and common install locations
     #[cfg(target_os = "windows")]
     {
         if let Ok(profile) = std::env::var("USERPROFILE") {
             let uv_exe = std::path::PathBuf::from(&profile)
-                .join(".local")
-                .join("bin")
-                .join("uv.exe");
+                .join(".local").join("bin").join("uv.exe");
             if uv_exe.exists() {
                 return Some(uv_exe.to_string_lossy().to_string());
             }
         }
         if let Ok(appdata) = std::env::var("LOCALAPPDATA") {
             let uv_exe = std::path::PathBuf::from(&appdata)
-                .join("uv")
-                .join("uv.exe");
+                .join("uv").join("uv.exe");
             if uv_exe.exists() {
                 return Some(uv_exe.to_string_lossy().to_string());
             }
         }
     }
 
-    // Fallback: use `which` (Unix) or `where` (Windows) to find in PATH
     #[cfg(not(target_os = "windows"))]
     let which_cmd = "which";
     #[cfg(target_os = "windows")]
@@ -78,13 +71,26 @@ fn find_uv() -> Option<String> {
     if let Ok(output) = std::process::Command::new(which_cmd).arg("uv").output() {
         if output.status.success() {
             let path = String::from_utf8_lossy(&output.stdout)
-                .lines()
-                .next()
-                .unwrap_or("")
-                .trim()
-                .to_string();
+                .lines().next().unwrap_or("").trim().to_string();
             if !path.is_empty() {
                 return Some(path);
+            }
+        }
+    }
+    None
+}
+
+fn find_sidecar_binary() -> Option<std::path::PathBuf> {
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(exe_dir) = exe.parent() {
+            #[cfg(not(target_os = "windows"))]
+            let sidecar_name = "mdconverter-sidecar";
+            #[cfg(target_os = "windows")]
+            let sidecar_name = "mdconverter-sidecar.exe";
+
+            let sidecar_path = exe_dir.join(sidecar_name);
+            if sidecar_path.exists() {
+                return Some(sidecar_path);
             }
         }
     }
@@ -116,34 +122,48 @@ pub fn spawn_sidecar(
 ) -> Result<(), String> {
     let shell = app.shell();
 
-    // Try bundled sidecar first (production), then fall back to uv (dev)
-    let spawn_result = shell
-        .sidecar("binaries/mdconverter-sidecar")
-        .ok()
-        .and_then(|cmd| cmd.spawn().ok());
+    // Strategy 1: Direct sidecar binary (production — next to the main executable)
+    if let Some(sidecar_path) = find_sidecar_binary() {
+        let sidecar_str = sidecar_path.to_string_lossy().to_string();
+        eprintln!("[sidecar] found binary at: {}", sidecar_str);
 
-    let (rx, child) = match spawn_result {
-        Some(pair) => pair,
-        None => {
-            // Development mode: use uv run
-            let uv_path = find_uv()
-                .ok_or("Could not find 'uv'. Install it: https://docs.astral.sh/uv/")?;
-            let backend_dir = find_backend_dir()
-                .ok_or("Could not find backend/ directory")?;
-            let backend_str = backend_dir.to_string_lossy().to_string();
-
-            eprintln!("[sidecar] dev mode: using {} with backend at {}", uv_path, backend_str);
-
-            shell
-                .command(&uv_path)
-                .args(["run", "--project", &backend_str, "python", "-m", "converter.main"])
-                .spawn()
-                .map_err(|e| format!("Failed to spawn Python via uv: {e}"))?
+        match shell.command(&sidecar_str).spawn() {
+            Ok((rx, child)) => {
+                eprintln!("[sidecar] production sidecar started");
+                start_listener(state, rx, child);
+                return Ok(());
+            }
+            Err(e) => {
+                eprintln!("[sidecar] production sidecar spawn failed: {e}");
+            }
         }
-    };
+    }
 
+    // Strategy 2: UV dev mode (development — backend/ directory exists)
+    let uv_path = find_uv()
+        .ok_or("Could not find 'uv' or sidecar binary")?;
+    let backend_dir = find_backend_dir()
+        .ok_or("Could not find sidecar binary or backend/ directory")?;
+    let backend_str = backend_dir.to_string_lossy().to_string();
+
+    eprintln!("[sidecar] dev mode: using {} with backend at {}", uv_path, backend_str);
+
+    let (rx, child) = shell
+        .command(&uv_path)
+        .args(["run", "--project", &backend_str, "python", "-m", "converter.main"])
+        .spawn()
+        .map_err(|e| format!("Failed to spawn sidecar: {e}"))?;
+
+    start_listener(state, rx, child);
+    Ok(())
+}
+
+fn start_listener(
+    state: &mut SidecarState,
+    mut rx: tokio::sync::mpsc::Receiver<CommandEvent>,
+    child: CommandChild,
+) {
     let pending = state.pending.clone();
-    let mut rx = rx;
 
     tauri::async_runtime::spawn(async move {
         while let Some(event) = rx.recv().await {
@@ -176,7 +196,6 @@ pub fn spawn_sidecar(
     });
 
     state.child = Some(child);
-    Ok(())
 }
 
 pub async fn send_convert_request(

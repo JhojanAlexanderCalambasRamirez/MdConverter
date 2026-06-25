@@ -5,9 +5,11 @@ const translations = {
     appTitle: 'MdConverter',
 
     // DropZone
-    dropHere: 'Drop files here',
-    dragAndDrop: 'Drag & drop files here',
+    dropHere: 'Drop files or folders here',
+    dragAndDrop: 'Drag & drop files or folders here',
     orClickToBrowse: 'or click to browse',
+    selectFolder: 'Select Folder',
+    loadingFolder: 'Scanning folder...',
 
     // FileList
     fileCount: (n: number) => `${n} file${n !== 1 ? 's' : ''}`,
@@ -28,6 +30,8 @@ const translations = {
     openFolder: 'Open Folder',
     viewFile: 'View file',
     exportedTo: 'Exported to the same location as the original file',
+    downloadZip: 'Download ZIP',
+    zipCreated: 'ZIP created successfully',
     convertMoreFiles: 'Convert More Files',
 
     // InfoSection
@@ -59,9 +63,11 @@ const translations = {
     appTitle: 'MdConverter',
 
     // DropZone
-    dropHere: 'Suelta los archivos aqui',
-    dragAndDrop: 'Arrastra y suelta archivos aqui',
+    dropHere: 'Suelta archivos o carpetas aqui',
+    dragAndDrop: 'Arrastra y suelta archivos o carpetas aqui',
     orClickToBrowse: 'o haz clic para buscar',
+    selectFolder: 'Seleccionar carpeta',
+    loadingFolder: 'Escaneando carpeta...',
 
     // FileList
     fileCount: (n: number) => `${n} archivo${n !== 1 ? 's' : ''}`,
@@ -82,6 +88,8 @@ const translations = {
     openFolder: 'Abrir carpeta',
     viewFile: 'Ver archivo',
     exportedTo: 'Exportado en la misma ubicacion del archivo original',
+    downloadZip: 'Descargar ZIP',
+    zipCreated: 'ZIP creado exitosamente',
     convertMoreFiles: 'Convertir mas archivos',
 
     // InfoSection
@@ -116,6 +124,8 @@ export interface Translations {
   dropHere: string;
   dragAndDrop: string;
   orClickToBrowse: string;
+  selectFolder: string;
+  loadingFolder: string;
   fileCount: (n: number) => string;
   convert: string;
   convertWith: (n: number) => string;
@@ -128,6 +138,8 @@ export interface Translations {
   openFolder: string;
   viewFile: string;
   exportedTo: string;
+  downloadZip: string;
+  zipCreated: string;
   convertMoreFiles: string;
   hideInfo: string;
   whatIsThis: string;

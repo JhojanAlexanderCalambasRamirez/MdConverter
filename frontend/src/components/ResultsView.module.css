@@ -154,7 +154,35 @@
   border-color: var(--color-accent);
 }
 
+.bottomActions {
+  display: flex;
+  gap: 10px;
+}
+
+.zipBtn {
+  padding: 10px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.zipBtn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.zipBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .resetBtn {
+  flex: 1;
   padding: 10px 20px;
   border: none;
   border-radius: var(--radius-sm);
